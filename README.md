@@ -111,18 +111,19 @@ _**What**_<br>
  The `GROUP BY` statement groups rows that have the same values into summary rows, like "find the number of customers in each country".
 - It is often used with aggregate functions (`COUNT()`, `MAX()`, `MIN()`, `SUM()`, `AVG()`) to group the result-set by one or more columns.
 
-**Syntax**
+**Syntax of `GROUP BY` with 'WHERE' clause**
 ~~~~mysql
-SELECT column_names, [aggregate function(column_name)]
-FROM table
-GROUP BY column_name1[, column_name2,…] 
-[HAVING conditions];
+SELECT column_name(s), [aggregate function(column_name)]
+FROM table_name
+WHERE condition
+GROUP BY column_name1 [, column_name2,…] 
+ORDER BY column_name [, column_name2,…] 
 ~~~~
 - `GROUP BY column_name1` is the clause that performs the grouping based on `column_name1`.
 -	`[,column_name2,…]` is optional; represents other column names when the grouping is done on more than one column.
--	`[HAVING condition]` is optional; it is used to restrict the rows affected by the `GROUP BY` clause. It is similar to the `WHERE` clause.
+  - If grouping done on many columns, it first groups by column_name1 and then by column_name2
 
-## Handing of Group-by with aggregate functions 
+## Handling of Group-by with aggregate functions 
 SQL-92 and earlier does not permit queries for which the `SELECT` clause, `HAVING` condition, or `ORDER BY` clause refer to non-aggregated columns (i.e. columns where you didn’t apply an aggregate function to in the query) that are not named in the `GROUP BY` clause. 
 > For example, this query is illegal in standard SQL-92 because the non-aggregated name column in the `SELECT` clause does not appear in the `GROUP BY`: <br>
 > ![image](https://user-images.githubusercontent.com/49015081/136260211-ff3938bc-d78c-44e2-9516-80871db5606a.png)
@@ -131,15 +132,15 @@ SQL-92 and earlier does not permit queries for which the `SELECT` clause, `HAVIN
 
 ### General form of Grouping and Aggregation
 ~~~~mysql
-SELECT S
+SELECT a1, …, ak, [aggregate function(column_name)]
 FROM R1, …, Rn
 WHERE C1
 GROUP BY a1, …, ak
 HAVING C2
 ~~~~
-- S : may contain attributes a1, …, ak and/or any aggregates.
-- C1 : is any condition on the attributes in R1, …, Rn
+- C1 : is any condition on the attributes in relations R1, …, Rn
 - C2 : is any condition on **aggregate expressions** and on attributes a1, …, ak
+- `[HAVING C2]` is optional; it is used to restrict the rows affected by the `GROUP BY` clause. It is similar to the `WHERE` clause.
 
 
 **Semantics of SQL with `GROUP BY`**
