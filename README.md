@@ -16,3 +16,9 @@ The identifier quote character is the backtick (`):
 
 
 
+~~~~mysql
+update employee
+  set salary = salary * 2
+  where salary < 100000
+~~~~
+
