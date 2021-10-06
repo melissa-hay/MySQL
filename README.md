@@ -106,6 +106,22 @@ WHERE column_name LIKE pattern;
 Here are some examples showing different LIKE operators with '%' and '_' wildcards:
 ![image](https://user-images.githubusercontent.com/49015081/136250456-5c364dd5-21cb-4eb1-b841-a470417c3745.png)
 
+# Agreggate functions 
+**Aggregate function** is used to accumulate information from multiple tuples, forming a single tuple summary. It is used to perform calculations on a set of values (multiple values) and return the result as a single scalar value like the average of all values, the sum of all values, and maximum & minimum value among certain groups of values. We mostly use the aggregate functions with the `GROUP BY` and `HAVING` clauses of the `SELECT` statement.
+
+> Note: aggregators only aggregate vertically. If you want to perform a calculation across rows, you would do this with simple arithmetic. <br>
+
+Five basic Built-in aggregate functions in SQL: 
+-	`COUNT` – returns # **rows** in a specified table or in a particular column, including rows with NULL values.
+-	`MIN` – returns the minimum value of non-NULL values in a **column**
+-	`MAX` – returns the maximum value of non-NULL values in a **column** 
+-	`SUM` – adds together all non-NULL values in a particular **column** 
+-	`AVG` – calculates the average of non-NULL values in a group of selected values.
+
+
+Notice that all aggregate functions above ignore `NULL` values except for the `COUNT` function.
+
+
 # `GROUP BY` clause
 _**What**_<br>
  The `GROUP BY` statement groups rows that have the same values into summary rows, like "find the number of customers in each country".
