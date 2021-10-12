@@ -229,7 +229,8 @@ _Notes_:
 - You can use them with `SELECT`, `INSERT`, `UPDATE`, and `DELETE` clauses, but they are most often used with `SELECT`.
 
 # Subqueries (nested queries)
-A **subquery** is a query within a query and it is used to answer multiple part questions.
+A **subquery** is a `SELECT` statement within another statement; it is used to answer multiple part questions. A subquery cannot include an `ORDER BY` clause.
+
 
 A subquery may occur in :
 - A `SELECT`, `INSERT`, `UPDATE` or `DELETE` clause
@@ -240,13 +241,17 @@ A subquery is usually added within the `WHERE` Clause of another `SELECT` statem
 You can use the comparison operators, such as >, <, or =. The comparison operator can also be a multiple-row operator, such as IN, ANY, or ALL.
 > The inner query executes first before its parent query so that the results of an inner query can be passed to the outer query.
 
+Subquery can be used to perform the following tasks:
+- Compare an expression to the result of the query.
+- Determine if an expression is included in the results of the query.
+- Check whether the query selects any rows.
+
 **Syntax**
 ~~~~mysql
 SELECT column_names(s) [AS alias] 
 FROM table_name
-WHERE conditions (SELECT column_names(s) from table_name);
+WHERE search_conditions (SELECT column_names(s) from table_name);
 ~~~~
-
 
 ### guidelines to consider when using subqueries
 - A subquery must be enclosed in parentheses. 
@@ -256,12 +261,76 @@ WHERE conditions (SELECT column_names(s) from table_name);
 - Use single-row operators with single-row subqueries. 
 - If a subquery (inner query) returns a `NULL` value to the outer query, the outer query will not return any rows when using certain comparison operators in a `WHERE` clause.
 
+## walkthrough of creating a subquery 
+![image](https://user-images.githubusercontent.com/49015081/137025216-cd2ed2de-37a1-4eae-9391-d52d1413d725.png)
+We have the following two tables `student` and `marks` with common field `StudentID` 
 
+Now we want to write a query to identify all students who get better marks than that of the student who's `StudentID` is `V002`, but we do not know the marks of `V002`.
 
+To solve the problem, we require 2 queries. 
+1.	One query returns the marks (stored in `Total_marks` field) of `V002` and 
+2.	A second query identifies the students who get better marks than the result of the first query.
 
+![image](https://user-images.githubusercontent.com/49015081/137025316-7461b957-e48c-4c52-b496-d95505ece784.png)
+The result of the first query is 80.
 
+Using the result of this query, here we have written another query to identify the students who get better marks than 80. Here is the query :
+![image](https://user-images.githubusercontent.com/49015081/137025351-7d9eb8fd-2083-4b58-823f-868053e5c96e.png)
 
+Above two queries identified students who get the better number than the student who's `StudentID` is `V002` (Abhay).
 
+You can combine the above two queries by placing one query inside the other. The subquery (also called the _inner query_) is the query inside the parentheses. See the following code and query result :
+![image](https://user-images.githubusercontent.com/49015081/137025428-acb8bdaa-1e41-4cfb-9651-d49605ef3401.png)
 
+_Pictoral representation of Subquery:_ 
+![image](https://user-images.githubusercontent.com/49015081/137025465-a2a81f32-235b-4633-96e1-de5b7a3705d5.png)
+
+## When to use subqueries (vs JOINS)
+Most subqueries can be restated as `JOINS`, and vice versa. When you use a subquery in a `WHERE` clause, its results cannot ve included in the final set because it is not included in the `FROM` clause.
+
+**JOIN** <br>
+- THE `SELECT` clause of a join can include columns from both tables.
+- A `JOIN` is generally more intuitive when it uses an **existin** relationship between the two tables, such as a primary key to foreign key relationship.
+
+~~~~mysql
+SELECT invoice_number, invoice_date, invoice_total
+FROM invoices JOIN vendors 
+   ON invoices.vendor_id = vendors.vendor_id
+WHERE vendor_state = 'CA'
+ORDER BY invoice_date;
+~~~~
+
+**Subquery**
+You can use a subquey to pass an aggregate value to the main query. A subquery tends to be more intuitive when it uses an **ad hoc** relationship between the two tables. Long, complex queries can sometimes be easier to code using subqueries.
+
+~~~~mysql
+SELECT invoice_number, invoice_datte, invoice_total
+FROM invoices 
+WHERE vendor_id IN 
+   (SELECT vendor_id       (1)         
+   FROM vendors
+   WHERE vendor_state = 'CA')
+ORDER BY invoice_date;
+~~~~
+- You cannot include a column name from the `vendors` table because it is not in the `FROM clause`, it is in the subquery.
+
+## 4 ways to introduce a subquery in a `SELECT` statement
+1. In a `WHERE` clause as a search condition
+2. In a `HAVING` clause as a search condition
+3. In the `FROM` clause as a table specification.
+4. In the `SELECT` clause as a column specification.
+
+Example <br>
+The following statement returns all the invoices from the invoices table that have invoice totals greater than the average of all the invoices.
+~~~~mysql
+SELECT invoice_number, invoice_date, invoice_total
+FROM invoices
+WHERE invoice_total >               (2)
+   (SELECT AVG(invoice_total)       (1)
+   FROM invoices)
+ORDER BY invoice_total;
+~~~~
+The suqeury calculates the average of all the invoices
+The search condition tests each invoice to see if its `invoice_total` is greater than that average.
 
 
