@@ -214,6 +214,11 @@ SELECT column_names(s) FROM alias [,table_name]
 [WHERE <join_condition>]
 ~~~~
 
+Only one `WITH` clause is permitted at the same level so use a single `WITH` clause that separates the subclauses by a comma:
+~~~~mysql
+WITH cte1 AS (...), cte2 AS (...) SELECT ...
+~~~~
+**syntax**
 ~~~~mysql
 WITH
   alias1 AS (SELECT column_name(s) FROM table1),
@@ -222,11 +227,45 @@ SELECT b, d FROM alias1 JOIN alias2
 WHERE <join_condition>;
 ~~~~
 
+To specify common table expressions, use a WITH clause that has one or more comma-separated subclauses. Each subclause provides a subquery that produces a result set, and associates a name with the subquery. The following example defines CTEs named cte1 and cte2 in the WITH clause, and refers to them in the top-level SELECT that follows the WITH clause:
+~~~~mysql
+WITH
+  cte1 AS (SELECT a, b FROM table1),
+  cte2 AS (SELECT c, d FROM table2)
+SELECT b, d FROM cte1 JOIN cte2
+WHERE cte1.a = cte2.c;
+~~~~
+
+- In the statement containing the WITH clause, each CTE name can be referenced to access the corresponding CTE result set.
+- A CTE name can be referenced in other CTEs, enabling CTEs to be defined based on other CTEs.
+
+
+However, a statement can contain multiple WITH clauses if they occur at different levels:
+~~~~mysql
+WITH cte1 AS (SELECT 1)
+SELECT * FROM (WITH cte2 AS (SELECT 2) SELECT * FROM cte2 JOIN cte1) AS dt;
+~~~~
+
+
 The following example defines CTEs named cte1 and cte2 in the WITH clause, and refers to them in the top-level `SELECT` that follows the `WITH` clause:
 
 _Notes_:
 - When you use multiple CTEs, separate them with commas.
 - You can use them with `SELECT`, `INSERT`, `UPDATE`, and `DELETE` clauses, but they are most often used with `SELECT`.
+
+**A WITH clause is permitted in these contexts:**
+- At the beginning of SELECT, UPDATE, and DELETE statements.
+~~~~mysql
+WITH ... SELECT ...
+WITH ... UPDATE ...
+WITH ... DELETE ...
+~~~~
+- At the beginning of subqueries (including derived table subqueries):
+~~~~mysql
+SELECT ... WHERE id IN (WITH ... SELECT ...) ...
+SELECT * FROM (WITH ... SELECT ...) AS dt ...
+~~~~
+
 
 # Subqueries (nested queries)
 A **subquery** is a `SELECT` statement within another statement; it is used to answer multiple part questions. A subquery cannot include an `ORDER BY` clause.
@@ -332,4 +371,127 @@ ORDER BY invoice_total;
 The suqeury calculates the average of all the invoices
 The search condition tests each invoice to see if its `invoice_total` is greater than that average.
 
+### SQL in WHERE clause 
 
+#### SQL EXISTS Operator
+The EXISTS operator is used to test for the existence of any record in a subquery. Typically used with a correlated subquery.
+
+**Syntax**
+~~~~mysql
+SELECT column_name(s)
+FROM table_name1
+WHERE EXISTS
+(SELECT column_name FROM table_name2 WHERE condition);
+~~~~
+
+**Example 1** <br> 
+Consider the schemas:
+- Company (cid, cname, city)
+- Product (pid, pname, price, cid)
+
+**Problem:** find all companies that make some products with price < 200. <br>
+![image](https://user-images.githubusercontent.com/49015081/137119186-12ad948a-6025-4199-abf7-08dea0b84017.png)
+![image](https://user-images.githubusercontent.com/49015081/137119203-72ce0648-4ac4-4918-be51-d55b9ccf4517.png)
+<br>Let’s use join rather than nested subqueries: <br>
+![image](https://user-images.githubusercontent.com/49015081/137119219-30bb071e-b2df-4af0-85fb-b03aae865165.png)
+
+**Example 2** <br>
+~~~~mysql
+SELECT vendor_id, vendor_name, vendor_state
+FROM vendors
+WHERE NOT EXISTS                            (2)
+   (SELECT *                                (1)
+    FROM invoices
+    WHERE vendor_id = vendors.vendor_id)
+~~~~
+1. Selects all invoices that have the same vendor_id as the current vendor in the outer query.
+2. Uses `NOT EXISTS` to test whether any invoices were found for the current vendor. If not, then the vendor row is included in the result set.
+#### SQL IN operator 
+The `IN` operator allows you to specify multiple values in a `WHERE` clause
+- It tests whetehr an expression is contained in a list of values. You can provide that list of values in a subquery. 
+- The IN operator is a shorthand for multiple OR conditions.
+- When you use the `IN` operator with a subquery, the subquery must return a single column that provides the list of values. 
+- Statements that use the `IN` operator with a subquery can usually be restated as an `OUTER JOIN`.
+
+**Syntax**
+~~~~mysql
+SELECT column_name (s)
+FROM table_name
+WHERE column_name IN (value1, value2,…)/ (SELECT STATEMENT);
+~~~~
+
+> **Compare IN with EXISTS**
+> -	`EXISTS` is much faster than `IN`, when the sub query results is very large.
+> -	`IN` is faster than `EXISTS`, when the subquery results is very small.
+> -	There is no functional differences between the two 
+
+
+Example <br>
+~~~~mysql
+SELECT vendor_id, vendor_name, vendor_state
+FROM vendors
+WHERE vendor_id NOT IN              (2)
+   (SELECT DISTINCT vendor_id       (1)
+   FROM invoices)
+ORDER BY vendor_id;
+~~~~
+
+1. Returns a list of each vendor that is in the invoices table.
+2. Returns data about the vendors whose IDs are not in that list.
+
+#### Comparison operators and subqueries
+
+When you use a comparison operator to return a single value, you need to use an aggregate function.
+~~~~mysql
+SELECT invoice_number, invoice_date,
+   invoice_total - payment_total - credit_total AS balance_due
+FROM invoices
+WHERE invoice_total - payment_total - credit_total > 0
+  AND invoice_total - payment_total - credit_total < 
+      (
+         SELECT AVG(invoice_total - payment_total - credit_total)
+         FROM invoices
+         WHERE invoice_total - payment_total - credit_total > 0
+      )
+ORDER BY invoice_total DESC;
+~~~~
+
+#### ALL keyword
+Returns a **boolean**. Used to modify the comparison operator so that the condition must be true for all the values retuned by a subquery. If no rows are returned by the subqeuery, a comparison that uses the `ALL` keyword is always true <br>
+![image](https://user-images.githubusercontent.com/49015081/137118449-cb213927-64e3-459d-80f9-060447e56468.png)
+
+**Example**: Return invoices larger than the largest invoice or vendor 34 <br>
+~~~~mysql
+SELECT vendor_name, invoice_number, invoice_total
+FROM invoices i JOIN vendors v ON i.vendor_id = v. vendor_id
+WHERE invoice_total > ALL       (2)
+   (SELECT invoice_total        (1)
+    FROM invoices
+    WHERE vendor_id = 34)
+ORDER BY vendor_name;
+~~~~
+1. Returns the invoice_total column from vendor 34
+2. Where the invoice_total is greater than any value returned in the subquery.
+
+#### ANY and SOME keywords
+Used to test whether a comparison is true for any of the values returned by a subquery. These keywords are interchangeable.
+
+**Example** <br>
+~~~~mysql
+SELECT vendor_name, invoice_number, invoice_total
+FROM invoices i JOIN vendors v ON i.vendor_id = v. vendor_id
+WHERE invoice_total < ANY       (2)
+   (SELECT invoice_total        (1)
+    FROM invoices
+    WHERE vendor_id = 115)
+~~~~
+1. Returns the invoice_total column from vendor 115
+2. Where the invoice_total value is less than any of the columns returned in the ANY subquery.
+
+This subquery could and should be rewritten using the `MAX` function:
+~~~~mysql
+WHERE invoice_total <        
+   (SELECT MAX(invoice_total)
+    FROM invoices
+    WHERE vendor_id = 115)
+~~~~
