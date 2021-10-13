@@ -31,6 +31,15 @@ An identifier may be quoted or unquoted. If an identifier contains special chara
 The identifier quote character is the backtick (`):
 
 # Joins 
+By default, joins in SQL are “inner joins” which is common one.
+
+Consider the 2 schemas:
+-	Product(name , category)
+-	Purchase(id , prodName , store)
+
+![image](https://user-images.githubusercontent.com/49015081/137153412-5664435c-f79f-4613-9a84-80aeaadad285.png) <br>
+
+Generally speaking, Joins are based on primary key == foreign key
 
 ## Cross Join
 
