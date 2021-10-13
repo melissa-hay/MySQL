@@ -65,7 +65,8 @@ WHERE condition;
 -	E.g., an Employee table may have a SupervisorID column that points to the employee that is the boss of the current employee.
 -	To query the data and get information for both people in one row, you could self join like this:  
 ![image](https://user-images.githubusercontent.com/49015081/137163831-15e10999-e2e7-4fe1-917f-4ed83329cea5.png) <br>
-- It's basically used where there is any relationship between rows stored in the same table. 
+- It's basically used where there is any relationship between rows stored in the same table. <br>
+
 **Self Join Example**
 ~~~~mysql
 SELECT DISTINCT v1.vendor_name, v1.vendor_city, v1.vendor_state
