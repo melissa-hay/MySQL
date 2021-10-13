@@ -111,12 +111,6 @@ The operant i.e. input in SQL bitwise must be numbers.
 - A bitwise AND is a binary operation that takes 2 equal-length (in binary) integers, converts them (under the hood) into binary representation and then performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, if both bits in the compared position are 1, the bit in the resulting binary representation is 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 
 - Other bitwise operators work in a similar fashion
 
-Bitwise op.	What	Example
-AND (&)	Input:  2 integers 
-•	performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, 1&1 = 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 	 
-OR (|)	Input:  2 integers 
-performs the logical inclusive OR operation on each pair of corresponding bits. The result in each position is 0 if both bits are 0; otherwise the result is 1	 
-XOR (^)	performs the logical exclusive OR operation on each pair of corresponding bits. The result in each position is 1 if only one of the bits is 1, but will be 0 if both are 0 or both are 1  i.e. result is 1 if the two bits are different, and 0 if they are the same.  <br>	 
 ![image](https://user-images.githubusercontent.com/49015081/137151309-60a542b1-2c03-4c35-89dd-3d9642e7b49c.png) <br>
 
 > What is the difference between logical AND and & (bitwise and)?
