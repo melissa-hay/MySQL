@@ -44,21 +44,19 @@ Generally speaking, Joins are based on primary key == foreign key
 ## Self Join
 A self-join is joining a table to itself. When a relation occurs twice in the `FROM` clause we call it a self-join.
 
-**Syntax (2 syntaxes similar to with inner joins)**
-| Syntax 1| Syntax 2 |  
-| ------------- |-------------| 
-| 
+###Syntax (2 syntaxes similar to with inner joins)
+**Syntax 1 **
 ~~~~mysql
 SELECT column_name(s) 
 FROM table1 T1 JOIN table1 T2
 ON condition(s); 
-~~~~| 
+~~~~
+**Syntax 2**
 ~~~~mysql
 SELECT column_name(s) 
 FROM table1 T1, table1 T2
 WHERE condition;
-~~~~ |
-
+~~~~ 
 - (Note: T1 and T2 are different table aliases for the same table.)
 - Self Join is a special case of inner join
 
