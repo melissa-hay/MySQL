@@ -106,6 +106,69 @@ WHERE column_name LIKE pattern;
 Here are some examples showing different LIKE operators with '%' and '_' wildcards:
 ![image](https://user-images.githubusercontent.com/49015081/136250456-5c364dd5-21cb-4eb1-b841-a470417c3745.png)
 
+## Bitwise Operators
+The operant i.e. input in SQL bitwise must be numbers.
+- A bitwise AND is a binary operation that takes 2 equal-length (in binary) integers, converts them (under the hood) into binary representation and then performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, if both bits in the compared position are 1, the bit in the resulting binary representation is 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 
+- Other bitwise operators work in a similar fashion
+
+Bitwise op.	What	Example
+AND (&)	Input:  2 integers 
+•	performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, 1&1 = 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 	 
+OR (|)	Input:  2 integers 
+performs the logical inclusive OR operation on each pair of corresponding bits. The result in each position is 0 if both bits are 0; otherwise the result is 1	 
+XOR (^)	performs the logical exclusive OR operation on each pair of corresponding bits. The result in each position is 1 if only one of the bits is 1, but will be 0 if both are 0 or both are 1  i.e. result is 1 if the two bits are different, and 0 if they are the same.  <br>	 
+![image](https://user-images.githubusercontent.com/49015081/137151309-60a542b1-2c03-4c35-89dd-3d9642e7b49c.png) <br>
+
+> What is the difference between logical AND and & (bitwise and)?
+> - Logical AND is based on the input datatype: T and F. 
+>   - Output is thus also either: T or F
+> - Bitwise AND is based on the input datatype: numbers, usually integers; it can be represented in memory as bits (which can be a signed int, unsigned int, char, etc.)
+>   - Output is also an int. 
+>	Thus output and input datatypes differ
+
+## Comparison Operators
+SQL Comparison Operators exceed their normal arithmetic meanings. In other words, there is more flexibility– can compare various different types of values. 
+
+**example**
+~~~~mysql
+SELECT COUNT(*)
+FROM invoices
+WHERE invoice_date > '2020 08 01'
+~~~~
+
+#NULL Value
+Special value that means:
+- unavailable
+- unassigned
+-	unknown
+-	inapplicable
+
+`NULL` is Not equivalent to:
+-	zero
+-	blank space
+
+Whenever we don’t have a value, we can put a `NULL`
+
+For numerical operations, NULL --> NULL: 
+-	If x = NULL then 4*(3 - x)/7 is still NULL
+
+For boolean operations, in SQL there are three values:
+-	False = 0
+-	Unknown = decimal number for example 0.5
+  - Unknown could be NULL
+-	True = 1
+
+Can test for NULL explicitly:
+-	`x IS NULL`
+-	`x IS NOT NULL`
+
+**Example**
+~~~~mysql
+SELECT *
+FROM Person
+WHERE age <25 OR age >= 25 OR age IS NULL
+~~~~
+
 # Agreggate functions 
 **Aggregate function** is used to accumulate information from multiple tuples, forming a single tuple summary. It is used to perform calculations on a set of values (multiple values) and return the result as a single scalar value like the average of all values, the sum of all values, and maximum & minimum value among certain groups of values. We mostly use the aggregate functions with the `GROUP BY` and `HAVING` clauses of the `SELECT` statement.
 
@@ -202,17 +265,19 @@ HAVING aggregate function(column_name3) > some_value;
 ~~~~
 
 # Common table expressions (CTE)
-A CTE is a `SELECT` statement that creates one or more named temporary result sets i.e. **aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries.
-To specify common table expressions, use a WITH clause that has one or more comma-separated subclauses. Each subclause provides a subquery that produces a result set, and associates a name with the subquery. 
+A CTE is a `SELECT` statement that creates one or more named temporary result sets i.e. **aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries. The `WITH` clause will compute the aggregation once, give it a name, and allow us to reference it (maybe multiple times), later in the query.
 
 CTEs begin with a `WITH` clause that has one or more comma-separated subclauses. Each subclause provides a subquery that produces a result set, and associates a name (alias) with the subquery. 
+> The `WITH` clause is very confusing at first because the SQL statement does not begin with the word `SELECT`. Instead, we use the `WITH` clause to start our SQL query, defining the aggregations, which can then be named in the main query as if they were real tables.
 
 **Syntax with 1 alias**
 ~~~~mysql
-WITH alias AS (SELECT column_name(s) FROM table_name)
+WITH alias 
+AS (SELECT column_name(s) FROM table_name)
 SELECT column_names(s) FROM alias [,table_name]
 [WHERE <join_condition>]
 ~~~~
+- Notice how the outer `SELECT` query uses the alias created in the `WITH` clause. 
 
 Only one `WITH` clause is permitted at the same level so use a single `WITH` clause that separates the subclauses by a comma:
 ~~~~mysql
@@ -371,9 +436,9 @@ ORDER BY invoice_total;
 The suqeury calculates the average of all the invoices
 The search condition tests each invoice to see if its `invoice_total` is greater than that average.
 
-### SQL in WHERE clause 
+## SQL in WHERE clause 
 
-#### SQL EXISTS Operator
+### SQL EXISTS Operator
 The EXISTS operator is used to test for the existence of any record in a subquery. Typically used with a correlated subquery.
 
 **Syntax**
@@ -406,7 +471,7 @@ WHERE NOT EXISTS                            (2)
 ~~~~
 1. Selects all invoices that have the same vendor_id as the current vendor in the outer query.
 2. Uses `NOT EXISTS` to test whether any invoices were found for the current vendor. If not, then the vendor row is included in the result set.
-#### SQL IN operator 
+### SQL IN operator 
 The `IN` operator allows you to specify multiple values in a `WHERE` clause
 - It tests whetehr an expression is contained in a list of values. You can provide that list of values in a subquery. 
 - The IN operator is a shorthand for multiple OR conditions.
@@ -439,7 +504,7 @@ ORDER BY vendor_id;
 1. Returns a list of each vendor that is in the invoices table.
 2. Returns data about the vendors whose IDs are not in that list.
 
-#### Comparison operators and subqueries
+### Comparison operators and subqueries
 
 When you use a comparison operator to return a single value, you need to use an aggregate function.
 ~~~~mysql
@@ -456,7 +521,7 @@ WHERE invoice_total - payment_total - credit_total > 0
 ORDER BY invoice_total DESC;
 ~~~~
 
-#### ALL keyword
+### ALL keyword
 Returns a **boolean**. Used to modify the comparison operator so that the condition must be true for all the values retuned by a subquery. If no rows are returned by the subqeuery, a comparison that uses the `ALL` keyword is always true <br>
 ![image](https://user-images.githubusercontent.com/49015081/137118449-cb213927-64e3-459d-80f9-060447e56468.png)
 
@@ -473,7 +538,7 @@ ORDER BY vendor_name;
 1. Returns the invoice_total column from vendor 34
 2. Where the invoice_total is greater than any value returned in the subquery.
 
-#### ANY and SOME keywords
+### ANY and SOME keywords
 Used to test whether a comparison is true for any of the values returned by a subquery. These keywords are interchangeable.
 
 **Example** <br>
@@ -494,4 +559,63 @@ WHERE invoice_total <
    (SELECT MAX(invoice_total)
     FROM invoices
     WHERE vendor_id = 115)
+~~~~
+## Subqueries in FROM clause 
+
+Sometimes we need to compute an intermediate / temporary table only to use it later in a `SELECT-FROM-WHERE`.
+-	Option 1: use a subquery in the FROM clause
+-	Option 2: use the WITH clause
+
+**Example** : Returns the largest invoice total for the top vendor in each state. <br>
+![image](https://user-images.githubusercontent.com/49015081/137148328-3ca19b10-2d72-416c-841a-e65f5cf7bf23.png) <br>
+Note that this can also be solved without a subquery. 
+
+
+Code a subquery in place of a table specification. The result is sometimes referred to as an inline view.
+When you code a subquery in the `FROM` clause, you must assign an alias.
+In the subquery, you should use an alias for any columns in the subquery that perform calculations. The main query can refer to the columns by these names.
+
+**Example** : Returns the largest invoice total for the top vendor in each state. <br>
+~~~~mysql
+SELECT vendor_state, MAX(sum_of_invoices) AS max_sum_of_invoices    (2)
+FROM 
+(
+   SELECT vendor_state, vendor_name,            (1)
+      SUM(invoice_total) AS sum_of_invoices     (2)
+   FROM vendors v JOIN invoices i
+         ON v.vendor_id = i.vendor_id
+   GROUP BY vendor_state, vendor_name
+) t                                             (3)
+GROUP BY vendor_state
+ORDER BY vendor_state;
+~~~~
+1. The subquery returns the sum of the invoice_total for every vendor that is in the invoices table
+2. Alias in the subquery is used in the main query.
+3. Alias for the subquery
+
+## Subqueries in the HAVING clause
+Specify a search condition just like the WHERE clause.
+
+## Subqueries in the SELECT clause
+Replace a column specification with a subquery. The result of a query must return a single value for that column. In most cases, you use a correlated subquery in the `SELECT` clause.
+
+You can usually restate each as a `JOIN`, so subqueries are not usually used in `SELECT` clause.
+**Example** <br>
+~~~~mysql
+SELECT vendor_name,
+   (SELECT MAX(invoice_date) FROM invoices              (1)
+    WHERE vendor_id = vendors.vendor_id) AS latest_inv
+FROM vendors
+ORDER BY latest_inv DESC;
+~~~~
+1. Calculates the maximum invoice date for each vendor in the vendors table by referring to the vendor_id from the vendors table in the FROM clause of the main query.
+Goes through each vendor_id in the invoices table and calculates the max date for each vendor_id in the vendors table. <br>
+
+Restated as a JOIN
+~~~~mysql
+SELECT vendor_name, MAX(invoice_date) AS latest_inv
+FROM vendors v
+   LEFT JOIN invoices i ON v.vendor_id = i.vendor_id
+GROUP BY vendor_name
+ORDER BY latest_inv DESC;
 ~~~~
