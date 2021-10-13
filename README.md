@@ -41,7 +41,81 @@ Consider the 2 schemas:
 
 Generally speaking, Joins are based on primary key == foreign key
 
+## Self Join
+A self-join is joining a table to itself. When a relation occurs twice in the `FROM` clause we call it a self-join.
+
+**Syntax (2 syntaxes similar to with inner joins)**
+| Syntax 1| Syntax 2 |  
+| ------------- |-------------| 
+| 
+~~~~mysql
+SELECT column_name(s) 
+FROM table1 T1 JOIN table1 T2
+ON condition(s); 
+~~~~| 
+~~~~mysql
+SELECT column_name(s) 
+FROM table1 T1, table1 T2
+WHERE condition;
+~~~~ |
+
+- (Note: T1 and T2 are different table aliases for the same table.)
+- Self Join is a special case of inner join
+
+### When to use Self join?
+-	You use a self join when a table references data in itself.
+-	E.g., an Employee table may have a SupervisorID column that points to the employee that is the boss of the current employee.
+-	To query the data and get information for both people in one row, you could self join like this:  
+![image](https://user-images.githubusercontent.com/49015081/137163831-15e10999-e2e7-4fe1-917f-4ed83329cea5.png) <br>
+- It's basically used where there is any relationship between rows stored in the same table. 
+**Self Join Example**
+~~~~mysql
+SELECT DISTINCT v1.vendor_name, v1.vendor_city, v1.vendor_state
+FROM vendors v1 JOIN vendors v2
+ON (v1.vendor_city = v2.vendor_city) AND (v1.vendor_state = v2.vendor_state) AND (v1.vendor_id <> v2.vendor_id)
+ORDER BY v1.vendor_state, v1.vendor_city;
+~~~~ 
+
+
 ## Cross Join
+`CROSS JOIN` keyword returns all records from both tables; it is used to join two or more unrelated tables <br>
+![image](https://user-images.githubusercontent.com/49015081/137162420-c7affc5e-5195-420b-a2cf-a676e6097545.png) <br>
+
+**Syntax for the CROSS JOIN of two tables**
+~~~~mysql
+SELECT T1.column_name(s), T2.column_name(s)
+FROM table1 T1
+CROSS JOIN table2 T2;
+[ORDER BY column_names(s) DESC];
+~~~~
+- T1 and T2 are table aliases
+-	The order by is optional 
+
+Cross join selects the all the rows from the first table and all the rows from second table and shows the result as a Cartesian product (i.e. cross product) with all possibilities.
+- When to use /Purpose of cross join: anytime you want to obtain all possible combinations from 2 tables
+
+Unlike the `INNER JOIN` or `LEFT JOIN`, the cross join does not establish a relationship between the joined tables.
+
+Suppose the T1 table contains three rows 1, 2, and 3 and the T2 table contains three rows A, B, and C.
+
+The `CROSS JOIN` gets a row from the first table (T1) and then creates a new row for every row in the second table (T2). It then does the same for the next row for in the first table (T1) and so on. <br>
+![image](https://user-images.githubusercontent.com/49015081/137162798-5be0517d-8960-4628-bfb4-d9af0c3d4206.png) <br>
+- In this illustration, the `CROSS JOIN` creates nine rows in total. 
+- In general, if the first table has n rows and the second table has m rows, the cross join will result in n x m rows.
+
+
+**Example**
+Consider the schemas for 2 relations:
+- Teacher (TchrId, teacherName) 
+- Student (StudId, TchrId, studentName)
+
+~~~~mysql
+SELECT T.TchrId, T.TeacherName, S.StudentName
+FROM Teacher T
+CROSS JOIN Student S;
+~~~~
+![image](https://user-images.githubusercontent.com/49015081/137162965-4b555595-55b4-41b3-ac6e-6d824a129d8f.png)
+
 
 # Foreign-key constraints 
 Also known as a reference constraint. This constraint requires values in one tabvle to match values in another table. Used to define the relationship between tables and to enforce referential integrity.<br>
@@ -235,7 +309,6 @@ FROM invoices;
 -	Aggregate functions only accept 1 parameter (cannot separate parameters by commas) but can use arithmetic operators to include more than 1 parameter (ex: min(column1 – column2) 
 
 
-
 **Example:** count all rows in individual columns <br>
 The following code will provide a count of all of rows in which the `invoice_number` column is not null.<br>
 ~~~~mysql
@@ -250,6 +323,28 @@ SELECT count(DISTINCT invoice_number)
 FROM invoices 
 WHERE invoice_total >= 300;
 ~~~~
+
+## Agreggate functions and JOIN
+- An aggregate function performs a calculation on a set of values, and returns a single value.
+- A `JOIN` clause is used to combine rows from two or more tables, based on a related column between them. 
+
+We can combine aggregate functions with Inner joins
+
+**Example**
+Consider the schemas for 2 relations:
+- Product( pid , pname , manufacturer)
+- Purchase( id , product_id , price, month)
+  - `Product_id` is the foreign key that refers to the primary key, `pid` in the `Product` table
+
+Problem: For each manufacturer, compute how many products with price > $100 they sold
+- Step 1– first condition in `WHERE` clause makes sure that the primary key = foreign key; 2nd condition in `WHERE` clause makes sure that price > $100. We want both conditions to be satisfied at same time --> via `AND` logical operator
+- Step 2– combines the `count(*)` function with an inner join and uses `GROUP BY` 
+
+![image](https://user-images.githubusercontent.com/49015081/137162168-eae7ea0d-8151-46d6-a489-65598c9e83bd.png) <br>
+
+Problem: For each manufacturer, compute how many products with price > $100 they sold in each month? <br>
+![image](https://user-images.githubusercontent.com/49015081/137162241-acfe5c75-4c5b-4c5d-9274-d44a7d134eb9.png) <br>
+
 
 # `GROUP BY` clause
 _**What**_<br>
@@ -334,14 +429,43 @@ HAVING aggregate function(column_name3) > some_value;
 ### `WHERE` vs. `HAVING`
 | `WHERE` Condition| `HAVING` Condition |
 | ------------- |:-------------:| 
-| is applied to individual rows | Is applied to the entire group |
-| - The rows may or may not contribute to the aggregate | - Only applicable if GROUP BY is involved |
-| -	No aggregates allowed in or after the WHERE clause | Entire group is returned, or removed |
-| | - May use aggregate functions on the group |
+| is applied to individual rows | Is applied to an entire group of group |
+| The rows may or may not contribute to the aggregate | Only applicable if GROUP BY is involved |
+| No aggregates allowed in or after the WHERE clause | Entire group is returned, or removed |
+| | May use aggregate functions on the group |
 
+**Example**
+~~~~mysql
+SELECT vendor_name,
+	COUNT(*) AS invoice_qty,                        (1)
+    ROUND(AVG(invoice_total), 2) AS invoice_avg     (2)
+FROM vendors JOIN invoices
+	ON vendors.vendor_id = invoices.vendor_id
+GROUP BY vendor_name                                (3)
+HAVING AVG(invoice_total) > 500                     (4)
+ORDER BY invoice_qty DESC;
+~~~~
+1. Calculates an invoice count for the vendor_name column (that is listed in the GROUP BY column)
+2. Calculates an average invoice amount
+3. Groups the invoices in the invoice table by vendor name
+4. Limits the groups in the result set to those that have an average invoice total greater than 500
 
+~~~~mysql
+SELECT vendor_name,
+	COUNT(*) AS invoice_qty,                        (1)
+    ROUND(AVG(invoice_total), 2) AS invoice_avg     (2)
+FROM vendors JOIN invoices
+	ON vendors.vendor_id = invoices.vendor_id
+WHERE invoice_total > 500                           (3)
+GROUP BY vendor_name                                (4)
+ORDER BY invoice_qty;
+~~~~
+1. Calculates an invoice count for the vendor_name column (that is listed in the GROUP BY column)
+2. Calculates an average invoice amount
+3. Limits the invoices in the groups to those that have an invoice total greater than 500. This is applied to every row before anything is grouped.
+4. The results of the WHERE clause are grouped by vendor_name
 
-
+**BEST PRACTICE** You can use either the `WHERE` or `HAVING` clause to code non-aggregate clauses, but it makes more sense to include them all in the `HAVING` clause for readability.
 
 # Common table expressions (CTE)
 A CTE is a `SELECT` statement that creates one or more named temporary result sets i.e. **aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries. The `WITH` clause will compute the aggregation once, give it a name, and allow us to reference it (maybe multiple times), later in the query.
