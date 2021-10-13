@@ -178,7 +178,7 @@ WHERE age <25 OR age >= 25 OR age IS NULL
 > Note: aggregators only aggregate vertically. If you want to perform a calculation across rows, you would do this with simple arithmetic. <br>
 
 Five basic Built-in aggregate functions in SQL: 
--	`COUNT` – returns # **rows** in a specified table or in a particular column, including rows with NULL values.
+-	`COUNT` – returns # **rows** in a specified table or in a particular column, including rows with NULL values that matches a specified criterion
 -	`MIN` – returns the minimum value of non-NULL values in a **column**
 -	`MAX` – returns the maximum value of non-NULL values in a **column** 
 -	`SUM` – adds together all non-NULL values in a particular **column** 
@@ -187,10 +187,74 @@ Five basic Built-in aggregate functions in SQL:
 
 Notice that all aggregate functions above ignore `NULL` values except for the `COUNT` function.
 
+## COUNT
+**Syntax**
+~~~~mysql
+SELECT column_name1, count(*) 
+FROM table 
+[WHERE conditions]
+GROUP BY column_name1;
+~~~~
+- Used to count # of rows in `column_name1`  if the rows satisfy  the conditions in the `WHERE` clause. 
+- Anytime `COUNT()` is placed after a `column_name` in the `SELECT` clause, `COUNT()` is applied to that column. 
+- If you name columns to select in addition to the `COUNT()` value, a `GROUP BY` clause should be present that names those same columns. 
+
+**Example:** Use COUNT() if you want to find out how many pets each owner has <br>
+![image](https://user-images.githubusercontent.com/49015081/137157044-1ae94ea3-c7be-4827-9860-031dd009ad5c.png) <br>
+- The preceding query uses `GROUP BY` to group all records for each owner. 
+
+**Example:** Use count() to get Number of animals per combination of species and sex <br>
+![image](https://user-images.githubusercontent.com/49015081/137157244-15dda415-95b4-4c65-9393-1dd6c1c7bc3e.png) <br>
+
+You need not retrieve an entire table when you use COUNT(). For example, the previous query, when performed just on dogs and cats, looks like this:<br>
+![image](https://user-images.githubusercontent.com/49015081/137157305-7bf1d54a-96e5-4695-acf1-fae8a054ea05.png) <br>
+
+## SUM
+An important thing to remember: aggregators only aggregate vertically. If you want to perform a calculation across rows, you would do this with simple arithmetic. 
+-	You don't need to worry as much about the presence of nulls with SUM as you would with COUNT, as SUM treats nulls as 0.
+
+**Examples ** 
+~~~~mysql
+SELECT SUM(order_qty * unit_price) 
+FROM orderdetails, item 
+WHERE orderdetails.item_id= item.item_id;
+~~~~
+## MIN and MAX
+-	They're similar to COUNT in that they can be used on non-numerical columns. 
+-	Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as close alphabetically to "A" as possible. 
+-	MAX does the opposite—it returns the highest number, the latest date, or the non-numerical value closest alphabetically to "Z."
+
+**Example ** 
+~~~~mysql
+SELECT MIN(invoice_total ) AS lowest_invoice_total ,
+MAX(invoice_total ) AS highest_invoice_total , 
+COUNT(*) AS number_of_invoices
+FROM invoices;
+~~~~
+- Note use of `AS` which saves the results from the aggregate function as an alias. 
+-	Aggregate functions only accept 1 parameter (cannot separate parameters by commas) but can use arithmetic operators to include more than 1 parameter (ex: min(column1 – column2) 
+
+
+
+**Example:** count all rows in individual columns <br>
+The following code will provide a count of all of rows in which the `invoice_number` column is not null.<br>
+~~~~mysql
+SELECT count( invoice_number ) 
+FROM invoices 
+WHERE invoice_total >= 300;
+~~~~
+
+Can also select distinct entries (ex: distinct invoice numbers). This will return the count w/o repeated values: 
+~~~~mysql
+SELECT count(DISTINCT invoice_number) 
+FROM invoices 
+WHERE invoice_total >= 300;
+~~~~
 
 # `GROUP BY` clause
 _**What**_<br>
- The `GROUP BY` statement groups rows that have the same values into summary rows, like "find the number of customers in each country".
+- The `GROUP BY` statement is used with the `SELECT` statement to arrange identical data into groups.
+- The `GROUP BY` statement groups rows that have the same values into summary rows, like "find the number of customers in each country".
 - It is often used with aggregate functions (`COUNT()`, `MAX()`, `MIN()`, `SUM()`, `AVG()`) to group the result-set by one or more columns.
 
 **Syntax of `GROUP BY` with 'WHERE' clause**
@@ -266,6 +330,18 @@ FROM table
 GROUP BY column_name1, column_name2 
 HAVING aggregate function(column_name3) > some_value;
 ~~~~
+
+### `WHERE` vs. `HAVING`
+| `WHERE` Condition| `HAVING` Condition |
+| ------------- |:-------------:| 
+| is applied to individual rows | Is applied to the entire group |
+| - The rows may or may not contribute to the aggregate | - Only applicable if GROUP BY is involved |
+| -	No aggregates allowed in or after the WHERE clause | Entire group is returned, or removed |
+| | - May use aggregate functions on the group |
+
+
+
+
 
 # Common table expressions (CTE)
 A CTE is a `SELECT` statement that creates one or more named temporary result sets i.e. **aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries. The `WITH` clause will compute the aggregation once, give it a name, and allow us to reference it (maybe multiple times), later in the query.
