@@ -16,6 +16,16 @@
 One or more columns in a table that refer to a primary key in another table (one-to-many relationship). 
 Note that foreign keys can have duplicates while primary keys cannot !
 
+# Data Types 
+
+## String Data Types
+| Type| Size | Description |
+| ------------- |-------------| -------------| 
+|Char(M)|Mx4|Static memory allocation / Fixed-length b/c depends on size, M, that is given when declaring the char cariable ; once declared with #characters = M (0 <= M <= 255), then 4xM bytes will be allocated and this size cannot be altered. Note that 4 bytes for each character are reserved. Ex: declaring 'CHAR(4)' creates a char variable that is 4 bytes. Whenever Char(4) is declared, regardless of what is stored in it, it will take up 4 bytes of storage (even if an empty string is stored in it).|
+|Varchar(M)|L+1|flexible/ variable length - memory allocation is dependent on real data; M is the maximum # of characters (0 <= M <= 255). The # of bytes used to store the string is equal to length of the string (L) + 1 byte to record its length. Ex: declaring VARCHAR(4), its size will vary depending on the exact string stored in it (up to a max of 4+1 bytes).| 
+
+![image](https://user-images.githubusercontent.com/49015081/137372021-292d35cd-7aa1-405f-87df-bca41e292d80.png)
+
 
 
 # column aliases
