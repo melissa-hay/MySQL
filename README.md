@@ -3,7 +3,7 @@
   When a primary key uses two or more columns<br>
   
 ***Constraint***<br>
-  When assigning column attributes, a _constraint_ restricts the type of data that can be stored in a column. For example, **NOT NULL** and **UNIQUE**.<br>
+  When assigning column attributes, a _constraint_ restricts the type of data that can be stored in a column. For example, `NOT NULL` and `UNIQUE`.<br>
   
 ***Data type*** <br>
   Determines the type of information that is stored in the column. Try to assign the data type that minimizes the use of disk storage because that improves the performance of     queries later.<br>
@@ -15,6 +15,30 @@
 ***Foreign key*** <br>
 One or more columns in a table that refer to a primary key in another table (one-to-many relationship). 
 Note that foreign keys can have duplicates while primary keys cannot !
+***Primary Key*** <br>
+Uniqueily identifies each row in the table. Usually a single column, but can be more than 1 column
+
+***DML (Data Manipulation Language)*** <br>
+Statements that work with the data in a db to Insert physical data, update, and delete rows in a table. Used to populate and manipulate database -> Commands affect 1 or more records in a table. DML only changes instances (table contents)
+- `SELECT` - gets data from one or more tables
+- `INSERT` - adds new rows to a table
+- `UPDATE` - changes existing rows in a table
+- `DELETE` - deletes existing rows from a table
+
+***DDL (Data Definition Language)*** <br>
+Statements for creating databases and work with the objects within a db to replace, alter and drop objects (usually used by db admins). Used to create the database schema -> Commands affect entire database or table. 
+![image](https://user-images.githubusercontent.com/49015081/137376457-6b0b5ac5-4de6-4fac-ad39-2d154c01f511.png)
+
+- `CREATE DATABASE` - creates a new db on the server
+- `CREATE TABLE` - creates a new table in a db
+- `CREATE INDEX` - creates a new index for a table
+- `ALTER TABLE` - changes the definition of an existing table
+- `ALTER INDEX` - changes the structure of an existing index
+- `DROP DATABASE` - deletes an existing db and all of its tables
+- `DROP TABLE` - deletes an existing table
+- `DROP INDEX` - deletes an existing index
+
+![image](https://user-images.githubusercontent.com/49015081/137375238-000bae66-8713-4144-8d8e-cb089f50bfcf.png)
 
 # Data Types 
 
@@ -26,9 +50,309 @@ Note that foreign keys can have duplicates while primary keys cannot !
 
 ![image](https://user-images.githubusercontent.com/49015081/137372021-292d35cd-7aa1-405f-87df-bca41e292d80.png)
 
+## Numeric data types
+- int
+- float
+- BOOL
+## Special data types: Date and time data types 
+- Date (‘YYYY-MM-DD’)
+  - Ex: '2020-11-11'
+- Time (hrs, mins, secs)
+
+## Constraint data types
+- NOT NULL constraint
+  - It is used to ensure that a given column of a table is never assigned the null value.
+  - You can declare a special attribute that is not null. Ex: Primary key is always not Null
+- Unique constraint
+  - It is the rule that the values of a key are valid only if they are unique.
+  - Can use the Unique keyword to declare an attribute as unique. Ex: defining an attribute as a Primary key or as foreign key, must use Unique keyword;
+- Primary key constraint
+  - It specifies that the constrained columns' values must uniquely identify each row.
+- Foreign key constraint
+  - It is used to prevent actions that would destroy links between tables
+- Check constraint
+  - It is used to limit the value range that can be placed in a column.
+# DML Statements: 
+DML statements are used to manipulate data in tables
+- SELECT
+- INSERT
+- UPDATE
+- DELETE
+
+## `SELECT` Statement
+**Syntax**
+~~~~mysql
+SELECT column1, column2, ...
+FROM table_name;
+[WHERE search_condition]
+[ORDER BY column(s)]
+[Group BY column(s)]
+~~~~ 
+- `column1, column2`, ... are the specific column names of the table you want to select data from. 
+- Brackets indicate optional clauses 
+
+To select all the fields (columns) available in the table, use the following syntax: <br>
+	`SELECT * FROM table_name;` <br>
+
+The **clauses** of the SELECT statement
+- `SELECT`: filters columns
+- `FROM`
+- `WHERE`:filters rows (records). It is used to extract only those records that fulfill a specified condition.
+- `ORDER BY`: Can order output in a certain way
+- `GROUP BY`
+
+The orders of clauses matter. `FROM` must always be used after SELECT. Correct Order is shown above
+
+SELECT DISTINCT column_name(s)` - use `DISTINCT` if you do not want the results table to include duplicate rows.
+![image](https://user-images.githubusercontent.com/49015081/137377275-c1ce1f08-c14a-49cb-8998-5ec20f391c20.png)
+
+## `INSERT INTO` Statement 
+The `INSERT INTO` statement is used to insert new records in a table. Insert is used in creating databases. Values refers to the physical data (exact values of the attributes).<br>
+There are 2 possible syntaxes <br>
+**Syntax 1:** Specify both the column names and the values to be inserted
+~~~~mysql
+INSERT INTO table_name (column1, column2, column3,…)
+VALUES (value1, value2, value3, ...);
+~~~~ 
+**Syntax 2:** If adding values for all the columns of the table, do not need to specify the column names in the SQL query. However, make sure the order of the values is in the same order as the columns in the table.
+~~~~mysql
+INSERT INTO table_name
+VALUES (value1, value2, value3, ...);
+~~~~ 
+
+- Note, if values are of type varchar or char, must put the value in single quotes
+- Syntax 1 is preferable b/c it is less error prone and more clear
+
+**example**
+~~~~mysql
+INSERT INTO vendors ( vendor_name , vendor_address , vendor_city ,
+vendor_state , vendor_zip_code
+VALUES('Toyota', '168 hodo ', nagoya ', nagoya', '1234567');
+~~~~ 
+## `UPDATE` Statement 
+`UPDATE` statement is used to modify the existing records in a table. <br>
+**Syntax:**
+~~~~mysql
+UPDATE table_name 
+SET column1 = value1, column2 = value2,
+WHERE condition;
+~~~~
+Must specify which physical data you want to change– which attribute associated with the primary key, you want to change
+
+**Example:** A UPDATE statement that changes one value in one row
+~~~~mysql
+UPDATE invoices 
+SET credit_total = 35.89
+WHERE invoice_number = ‘P400008’ and invoice_id = 5;
+~~~~
+
+Ex: UPDATE statement that changes one value in multiple rows (note: term_id is not a key)
+~~~~mysql
+UPDATE invoices
+SET invoice_due_date = invoice_due_date + 30
+WHERE terms_id = 4;
+~~~~
+
+## `DELETE` Statement 
+`DELETE` statement is used to delete existing records (rows) in a table as long as a condition is met. Note that this is used to delete physical data, not a table itself (this uses Drop from DDL).
+**Syntax:**
+~~~~mysql
+DELETE FROM table_name 
+WHERE condition;
+~~~~
+
+**Example:** A statement that deletes a selected invoice <br>
+`DELETE FROM invoices WHERE invoice_number = = ‘P400000'` <br>
+
+**Example:** A statement that deletes all paid invoices <br>
+~~~~mysql
+DELETE FROM invoices 
+WHERE invoice_total - payment_total - credit_total = 0
+~~~~
+
+# `WHERE` Clause
+The `WHERE` clause specifies the condition a row must meet to be selected. Also called the **search condition**; it filters the rows in the base table by the boolean expression returned by a comparison operator– boolean expressions can be true, false, or NULL in value. For example, `WHERE value > 0`. <br>
+If you omit the `WHERE` clause, all the rows in the base table are returned.
+
+## Comparison operators
+- Comparison operators are used in `WHERE` clause. You cannot use them in the `SELECT` statement
+- Comparison operations result in a value of `1` (`TRUE`), `0` (`FALSE`), or `NULL`.
+- The comparison must be conducted between values of the same data type.
+- When comparing values of different data types, you can use CAST() function to convert a value to a specific type.
+  - If `CAST()` function is not used when you compare strings with numbers, strings are automatically converted to numbers. The same is also true for numbers where numbers are automatically converted to strings as necessary. 
+- By default, string comparisons are not case sensitive and it relies on the current character set of the column, table, database, or server.
+- Can also use logical (`AND`, `OR`, `NOT`, etc) operators with `WHERE` 
+The following operators can be used in the `WHERE` clause: <br>
+![image](https://user-images.githubusercontent.com/49015081/137379377-8051b0b5-0092-44c4-92c6-a168b20d18c6.png)<br>
+
+## Using Null and Not Null as filter conditions
+> `NULL` Value is a special value that means:
+> - unavailable
+> - unassigned
+ >- unknown
+> - inapplicable
+> 
+> `NULL` is Not equivalent to:
+> - zero
+> - blank space
+> 
+> Whenever we don’t have a value, we can put a `NULL`
+> 
+> For numerical operations, NULL --> NULL: 
+> - If x = NULL then 4*(3 - x)/7 is still NULL
+> 
+> For boolean operations, in SQL there are three values:
+> - False = 0
+> - Unknown = decimal number for example 0.5
+>   - Unknown could be NULL
+> - True = 1
+> 
+> Can test for NULL explicitly:
+> - `x IS NULL`
+> - `x IS NOT NULL`
+
+Can write a `SELECT` statement that retrieves rows with null values or non null values using the `WHERE` clause. 
+
+**Example**
+~~~~mysql
+SELECT *
+FROM Person
+WHERE age <25 OR age >= 25 OR age IS NULL
+~~~~
+
+## Expressions in `WHERE` clauses using arithmetic operators
+**Example: ** An expression in the WHERE clause
+~~~~mysql
+SELECT invoice_number , invoice_date , invoice_total , payment_total , credit_total, invoice_total - payment_total - credit_total AS balance_due
+FROM invoices
+WHERE invoice_total - payment_total - credit_total > 0
+ORDER BY invoice_date
+~~~~
+
+An intermediate variable (a **column alias**) like `balance_due` cannot be referred to anywhere in the query. Ex: cannot do: `WHERE balance_due > 0` or, `ORDER BY balance_due`. The following is not valid:
+~~~~mysql
+SELECT invoice_number , invoice_date , invoice_total , payment_total , credit_total, invoice_total - payment_total - credit_total AS balance_due
+FROM invoices
+WHERE balance_due > 0
+ORDER BY invoice_date
+~~~~
+**BUT**, if the **alias is for a table**, then it **can be referred to**
+
+# SQL Operators 
+- SQL Arithmetic Operators: +, -, *, /, %
+- SQL Bitwise Operators: & (and), |(or), ^ (xor)
+- SQL Comparison Operators: =, >, <, >=, <=, <> (not equal to)
+- SQL Logical Operators: AND, OR, EXISTS, IN, LIKE, SOME…
+
+## Logical Operators: `AND`, `OR`, `NOT`
+The `WHERE` clause can be combined with `AND`, `OR`, and `NOT` operators.
+
+The `AND` and `OR` operators are used to filter records based on more than one condition:
+- The AND`AND`operator displays a record if all the conditions separated by `AND` are `TRUE`.
+- The `OR` operator displays a record if any of the conditions separated by `OR` is `TRUE`.
+The `NOT` operator displays a record if the condition(s) is `NOT TRUE`. <br>
+
+![image](https://user-images.githubusercontent.com/49015081/137380181-b72d21c2-d8a9-4a98-8de9-567528b61e0c.png) <br>
 
 
-# column aliases
+## `LIKE` operator: pattern matching 
+`LIKE` is used in a `WHERE` clause to search for a specified pattern in a column.
+
+You can use two wildcards with `LIKE`:
+|Character| Definition| Example| Returns|
+|---------|-----------|--------|--------|
+|`%`|matches any number of characters: zero, one, or multiple characters|`WHERE vendor_city LIKE 'SAN%'`|matches San Diego, Santa Ana|
+|`_`|matches exactly 1 character|`WHERE vendor_name LIKE 'COMPU_ER'`|Matches Compuserve, Computerworld|
+
+
+These can be used in combinations! You can also combine any number of conditions using `AND` or `OR` operators.
+
+**Syntax**
+~~~~mysql
+SELECT * FROM table_name
+WHERE column_name LIKE pattern;
+~~~~
+<br>
+
+**Wildcard descriptions**
+![image](https://user-images.githubusercontent.com/49015081/136250727-e1106a5d-787b-4c11-8269-ebcfac4dd1c3.png)
+
+Here are some examples showing different LIKE operators with '%' and '_' wildcards:
+![image](https://user-images.githubusercontent.com/49015081/136250456-5c364dd5-21cb-4eb1-b841-a470417c3745.png)
+
+## Bitwise Operators
+The operant i.e. input in SQL bitwise must be numbers.
+- A bitwise AND is a binary operation that takes 2 equal-length (in binary) integers, converts them (under the hood) into binary representation and then performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, if both bits in the compared position are 1, the bit in the resulting binary representation is 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 
+- Other bitwise operators work in a similar fashion
+
+![image](https://user-images.githubusercontent.com/49015081/137151309-60a542b1-2c03-4c35-89dd-3d9642e7b49c.png) <br>
+
+> What is the difference between logical AND and & (bitwise and)?
+> - Logical AND is based on the input datatype: T and F. 
+>   - Output is thus also either: T or F
+> - Bitwise AND is based on the input datatype: numbers, usually integers; it can be represented in memory as bits (which can be a signed int, unsigned int, char, etc.)
+>   - Output is also an int. 
+> Thus output and input datatypes differ
+
+# The `AS` Keyword
+- The `AS` keyword is used to rename a column or table with an **alias**. An alias only exists for the duration of the query.
+- It only **exists for the duration of the query** meaning that the `AS` keyword is a way to organize data and to temporarily view it during a query; SELECT doesn’t change any backend values in the database
+- We could say for example, `SELECT invoice_ID AS invoice FROM invoices`. Then, the `invoice_id` column will be displayed to us a column titled `invoice`. 
+- When there is a space in the alias name, enclose the alias name in quotes. For example, 'Test Row'
+
+## Table aliases
+The following SQL statement selects all the orders from the customer with `CustomerID=4` (Around the Horn). We use the `Customers` and `Orders` tables, and give them the table aliases of `c` and `o` respectively (Here we use aliases to make the SQL shorter): 
+~~~~mysql
+SELECT o.OrderID , o.OrderDate , c.CustomerName
+FROM Customers AS c, Orders AS o
+WHERE c.CustomerName= "Around the Horn" AND c.CustomerID= o.CustomerID
+~~~~
+
+## column aliases
+An alias can be used in a query select list to give a column a different name. You can use the alias in `GROUP BY`, `ORDER BY`, or `HAVING` clauses to refer to the column: <br>
+![image](https://user-images.githubusercontent.com/49015081/137382239-f9f2b04f-22b4-4924-bce4-ba308e097045.png) <br>
+
+Standard SQL disallows references to column aliases in a `WHERE` clause. This restriction is imposed because when the `WHERE` clause is evaluated, the column value may not yet have been determined (think of it as the entire `SELECT` including aliases, is applied after the `WHERE` clause). For example, the following query is illegal:<br>
+![image](https://user-images.githubusercontent.com/49015081/137382317-5fadffda-aff2-4697-84c6-f45b3f0af82a.png) <br>
+- The `WHERE` clause determines which rows should be included in the `GROUP BY` clause, but it refers to the alias of a column value that is not known until after the rows have been selected, and grouped by the `GROUP BY`
+
+### To re-use an alias 
+Simply wrap your reused alias with (`SELECT alias`) as follows:
+~~~~mysql
+SELECT 10 AS my_num, 
+       (SELECT my_num) * 5 AS another_number
+FROM table
+~~~~
+- Note that `my_num` and `another_number` are the aliases here
+
+# `ORDER BY` keyword
+The `ORDER BY` keyword is used to sort the result set in ascending or descending order. By default, `ORDER BY` sorts in ascending order
+
+**Syntax**
+~~~~mysql
+SELECT column1, column2, ...
+FROM table_name
+ORDER BY column1, column2, ... ASC|DESC
+~~~~
+
+**Example**
+~~~~mysql
+SELECT vendor_name, CONCAT(vendor_city ,‘‘, vendor_state) AS address
+FROM vendors
+ORDER BY vendor_name
+~~~~
+This query creates a temporary column called `address`:
+- The single quote, ‘ ‘  puts a space between city and state
+- `CONCAT` function is a SQL string function that concatenates two or more strings into a single string. 
+- Another valid way to concatenate strings is by using `+`. Ex: `vendor_city + ‘‘ + vendor_state AS address`
+
+**Example:** A SELECT statement that projects and sorts
+~~~~mysql
+SELECT invoice_number, invoice_date, invoice_total
+FROM invoices 
+ORDER BY invoice_total;
+~~~~
+- Default ordering is in ascending order
 
 # Language structure 
 ## Schema Object Names 
@@ -41,15 +365,122 @@ An identifier may be quoted or unquoted. If an identifier contains special chara
 The identifier quote character is the backtick (`):
 
 # Joins 
-By default, joins in SQL are “inner joins” which is common one.
+A JOIN clause in SQL is used to combine rows from two or more tables, based on a related attributes between them.
+
+By default, joins in SQL are “inner joins” which is the most common one.
 
 Consider the 2 schemas:
--	Product(name , category)
--	Purchase(id , prodName , store)
+- Product(name , category)
+- Purchase(id , prodName , store)
 
 ![image](https://user-images.githubusercontent.com/49015081/137153412-5664435c-f79f-4613-9a84-80aeaadad285.png) <br>
 
-Generally speaking, Joins are based on primary key == foreign key
+Generally speaking, Joins are based on primary key == foreign key. 
+
+## Types of Joins
+***Inner joins:*** returns all records that have matching rows in both tables --> this is the intersection of the tables. <br>
+![image](https://user-images.githubusercontent.com/49015081/137383300-8435011f-a946-41ba-b49c-9768b0d31f75.png) <br>
+***Outer joins–*** 3 types:
+1) ***LEFT JOIN:*** returns only matched rows from right table and ALL (even unmatched) rows from the left table i.e. returns ‘inner join + additional info in RS table) 
+   - `A LEFT JOIN B` would return table A
+   - Note the ‘+’ above indicates union
+2) ***RIGHT JOIN:*** returns only matched rows from left table and ALL (even unmatched rows) from the right table i.e. returns ‘inner join + additional info in RS table)
+   - `A RIGHT JOIN B` would return table B
+3) ***FULL OUTER JOIN:*** returns all rows (doesn't matter if they are matched or not) from both tables i.e. returns left outer join + right outer join (full outer join is a combo of left outer join and right outer join)
+   - This returns the entire union of both tables --> returns all rows in both tables that match the query’s `WHERE` clause, and in cases where the `ON` condition can’t be satisfied for those rows, it puts null values in for the unpopulated fields. <br>
+![image](https://user-images.githubusercontent.com/49015081/137383558-89201149-ee88-42d6-82e6-e8add521ec5b.png) <br>
+![image](https://user-images.githubusercontent.com/49015081/137386137-bb54aed4-76bd-4a14-a3a7-dd3c4d6a9615.png) <br>
+> ### Inner vs. Outer Join:
+> - An inner join retrieves the matched rows only whereas an outer join retrieves the matched rows PLUS all rows in the other table
+
+***Cross Join:*** produces cartesian product (returns all possible combos of all rows) between the 2 tables. It has no `ON` clause b/c you’re just joining everything to everything 
+
+> ### Full outer vs. cross join:
+> - a cross join with an empty table (or result set) results in empty table (M x N; hence M x 0 = 0)
+> - A full outer join will always have rows unless both M and N are 0.
+
+## Inner Join 
+`INNER JOIN`  selects all rows from both tables as long as there is a match between the columns. If there are records in the `Orders` table that do not have matches in `Customers`, these orders will not be shown
+
+###Syntax (2 syntaxes. Both work)
+**Syntax 1 : Explicit JOIN syntax**
+~~~~mysql
+SELECT column_name(s)
+FROM table1 
+INNER JOIN table2
+ON table1.column_name = table2.column_name…;
+~~~~
+- `ON` specifies the Join conditions i.e. `ON condition1, condition2` 
+- Can omit the word `INNER` and use only `JOIN` instead of `INNER JOIN` b/c Inner Join is the default keyword for Join and both can be used interchangeably <br>
+![image](https://user-images.githubusercontent.com/49015081/137384403-d51a0cdd-c4a5-4f04-8737-3b5a4c1147ec.png) <br>
+
+**Syntax 2 : Implicit JOIN syntax**
+~~~~mysql
+SELECT T1.column_name(s), T2.column_name(s)
+FROM table1 T1, table2 T2
+WHERE T1.column_name = T2.column_name…;
+~~~~ 
+- T1 and T2 are table aliases
+- `WHERE` specifies the Join conditions i.e. `WHERE table1.condition1 = table2.condition2,…`
+
+**Notes:**
+- Usually, the condition(s) is based on primary key and foreign key
+- only the columns indicated in `SELECT column_name(s)` will be displayed in the output. 
+
+**How Inner Join works**
+- compares each row of table 1 with each row of table 2 to see which rows satisfy the conditions. 
+- If a row from each of the tables satisfies a condition, it will be in the output. 
+- In other words, the satisfying rows from both tables will be joined together and put in the output. 
+- Then, only SELECTed columns of those rows will be displayed.
+
+### Example
+We can combine the following two tables with the help of an inner join clause being used on the field CompanyId (in our case this shares a foreign key relationship).<br>
+![image](https://user-images.githubusercontent.com/49015081/137384702-2e0915ec-38d9-4d3d-999b-d827deb07c47.png)<br>
+
+Below is the result set of the above SQL Inner Join query. For each row in the table PizzaCompany, Inner Join compares and finds the matching rows in the table Foods and returns all the matching rows as shown below. And if you notice, CompanyId = 5 is excluded from the query result, as it does not make a match in the Foods table.<br>
+![image](https://user-images.githubusercontent.com/49015081/137384766-530f8a99-12d5-4764-a994-392ad99fada5.png) <br>
+
+### Example: Joining two tables using the explicit join syntax
+The two tables used here are called: vendors and invoices. 
+~~~~mysql
+SELECT invoice_number, vendor_name              (1)
+FROM vendors INNER JOIN invoices                (2)
+   ON vendors.vendor_id = invoices.vendor_id    (3)
+ORDER BY invoice_number;                        (4)
+~~~~
+(1) Standard `SELECT` clause
+(2) `FROM` clause that names the two tables that are joined `INNER` keyword is optional
+(3) `ON` phrase that names the columns where the tables are joined and how they are compared columns preceded by table_name. are called 'qualified columns' because you have explain which table they came from
+(4) Standard `ORDER BY` clause
+
+### Example:  Joining two tables using the implicit join syntax
+~~~~mysql
+SELECT vendor_name , invoice_number , invoice_date , invoice_total
+FROM vendors, invoices
+WHERE vendors.vendor_id = invoices.vendor_id AND invoice_total >= 200
+ORDER BY vendor_name , invoice_total DESC;
+~~~~
+### `GROUP BY` with inner join
+SQL Inner Join permits us to use `Group by` clause along with aggregate functions to group the result set by one or more columns. Group by works conventionally with Inner Join on the final result returned after joining two or more tables. <br>
+![image](https://user-images.githubusercontent.com/49015081/137385260-8a55fbb2-65e6-4eeb-9b15-5b52150fd012.png) <br>
+Here, we intend to obtain total items sold by each Pizza company present in the City. As you can see below, aggregated result in `totalquantitysold` column as `18` (7+11) and `9` (6+3) for `Los Angeles` and `San Diego` respectively is computed <br>
+![image](https://user-images.githubusercontent.com/49015081/137385326-6ef66515-a294-4092-a5fc-1fbe97338ea1.png) <br>
+
+
+## Left Join 
+
+![image](https://user-images.githubusercontent.com/49015081/137386216-77e3f60e-bdd4-4d72-b107-a2492f6f86bd.png) <br>
+- `ON` indicates join condition
+- `SELECT` indicates what columns will be output
+- Since `OneClick` in `Product.name` doesn’t occur in `purchase.prodName`, the `Store` column in the output will be `NULL`
+
+## Full outer Join 
+The output of outer join = the output of inner join + unmatched rows
+- The ‘+’ indicates union <br>
+- ![image](https://user-images.githubusercontent.com/49015081/137386599-c3f4db5f-9638-4143-9f64-9e659971c3dc.png) <br>
+- In the output, the row `OneClick NULL` is from the left outer join; the row `NULL Foo` is from right outer join. Both rows are included in the full outer join’s output
+- Rows without `NULL` values indicate the results from an intersection i.e. inner join
+
 
 ## Self Join
 A self-join is joining a table to itself. When a relation occurs twice in the `FROM` clause we call it a self-join.
@@ -168,92 +599,6 @@ CREATE TABLE Orders(
       FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
 );
 ~~~~
-# SQL Operators 
-- SQL Arithmetic Operators: +, -, *, /, %
-- SQL Bitwise Operators: & (and), |(or), ^ (xor)
-- SQL Comparison Operators: =, >, <, >=, <=, <> (not equal to)
-- SQL Logical Operators: AND, OR, EXISTS, IN, LIKE, SOME…
-
-## Logical Operators
-
-### `LIKE` operator: pattern matching 
-`LIKE` is used in a `WHERE` clause to search for a specified pattern in a column.
-
-You can use two wildcards with `LIKE`:
-- `%` matches any number of characters: zero, one, or multiple characters 
-- `_` matches exactly 1 character
-
-These can be used in combinations! You can also combine any number of conditions using `AND` or `OR` operators.
-
-**Syntax**
-~~~~mysql
-SELECT * FROM table_name
-WHERE column_name LIKE pattern;
-~~~~
-<br>
-
-**Wildcard descriptions**
-![image](https://user-images.githubusercontent.com/49015081/136250727-e1106a5d-787b-4c11-8269-ebcfac4dd1c3.png)
-
-Here are some examples showing different LIKE operators with '%' and '_' wildcards:
-![image](https://user-images.githubusercontent.com/49015081/136250456-5c364dd5-21cb-4eb1-b841-a470417c3745.png)
-
-## Bitwise Operators
-The operant i.e. input in SQL bitwise must be numbers.
-- A bitwise AND is a binary operation that takes 2 equal-length (in binary) integers, converts them (under the hood) into binary representation and then performs the logical AND operation on each pair of the corresponding bits (which is equivalent to multiplying them. Thus, if both bits in the compared position are 1, the bit in the resulting binary representation is 1 (1 × 1 = 1); otherwise, the result is 0 (1 × 0 = 0 and 0 × 0 = 0). 
-- Other bitwise operators work in a similar fashion
-
-![image](https://user-images.githubusercontent.com/49015081/137151309-60a542b1-2c03-4c35-89dd-3d9642e7b49c.png) <br>
-
-> What is the difference between logical AND and & (bitwise and)?
-> - Logical AND is based on the input datatype: T and F. 
->   - Output is thus also either: T or F
-> - Bitwise AND is based on the input datatype: numbers, usually integers; it can be represented in memory as bits (which can be a signed int, unsigned int, char, etc.)
->   - Output is also an int. 
->	Thus output and input datatypes differ
-
-## Comparison Operators
-SQL Comparison Operators exceed their normal arithmetic meanings. In other words, there is more flexibility– can compare various different types of values. 
-
-**example**
-~~~~mysql
-SELECT COUNT(*)
-FROM invoices
-WHERE invoice_date > '2020 08 01'
-~~~~
-
-#NULL Value
-Special value that means:
-- unavailable
-- unassigned
--	unknown
--	inapplicable
-
-`NULL` is Not equivalent to:
--	zero
--	blank space
-
-Whenever we don’t have a value, we can put a `NULL`
-
-For numerical operations, NULL --> NULL: 
--	If x = NULL then 4*(3 - x)/7 is still NULL
-
-For boolean operations, in SQL there are three values:
--	False = 0
--	Unknown = decimal number for example 0.5
-  - Unknown could be NULL
--	True = 1
-
-Can test for NULL explicitly:
--	`x IS NULL`
--	`x IS NOT NULL`
-
-**Example**
-~~~~mysql
-SELECT *
-FROM Person
-WHERE age <25 OR age >= 25 OR age IS NULL
-~~~~
 
 # Agreggate functions 
 **Aggregate function** is used to accumulate information from multiple tuples, forming a single tuple summary. It is used to perform calculations on a set of values (multiple values) and return the result as a single scalar value like the average of all values, the sum of all values, and maximum & minimum value among certain groups of values. We mostly use the aggregate functions with the `GROUP BY` and `HAVING` clauses of the `SELECT` statement.
@@ -267,8 +612,17 @@ Five basic Built-in aggregate functions in SQL:
 -	`SUM` – adds together all non-NULL values in a particular **column** 
 -	`AVG` – calculates the average of non-NULL values in a group of selected values.
 
-
 Notice that all aggregate functions above ignore `NULL` values except for the `COUNT` function.
+
+**Syntax**
+`aggregate_function_name(DISTINCT|ALL expression)`
+- `ALL` keyword is a default. This includes all values except for null values.
+- `COUNT(*)` includes null values
+- Use `DISTINCT` if you do not want duplicate values included.
+  - Most often, you will use `DISTINCT` with the `COUNT` function.
+  - It does not have an effect on `MIN` or `MAX`
+
+NOTE: The result of an aggregate function is typically just a column name.
 
 ## COUNT
 **Syntax**
@@ -296,12 +650,22 @@ You need not retrieve an entire table when you use COUNT(). For example, the pre
 An important thing to remember: aggregators only aggregate vertically. If you want to perform a calculation across rows, you would do this with simple arithmetic. 
 -	You don't need to worry as much about the presence of nulls with SUM as you would with COUNT, as SUM treats nulls as 0.
 
-**Examples ** 
+**Example ** 
 ~~~~mysql
 SELECT SUM(order_qty * unit_price) 
 FROM orderdetails, item 
 WHERE orderdetails.item_id= item.item_id;
 ~~~~
+**Example ** 
+~~~~mysql
+SELECT COUNT(*) AS number_of_invoices,
+   SUM(invoice_total - payment_total - credit_total) AS total_due   (1)
+FROM invoices
+WHERE invoice_total - payment_total - credit_total > 0;             (2)
+~~~~
+1. `SUM` function calculates the balance due of an invoice using 3 columns and an alias. The result is a single value that represents the total amount due for all the selected invoices.
+2. The `WHERE` clause filters these to show where a balance is due.
+
 ## MIN and MAX
 -	They're similar to COUNT in that they can be used on non-numerical columns. 
 -	Depending on the column type, MIN will return the lowest number, earliest date, or non-numerical value as close alphabetically to "A" as possible. 
@@ -398,7 +762,7 @@ HAVING C2
 2.	`GROUP BY` by the attributes a1, …, ak
 3.	Apply condition C2 to each group (may have aggregates)
     - `HAVING` is evaluated after `GROUP BY`
-5.	Compute aggregates in S and return the result
+4.	Compute aggregates and return the result
 
 
 # `HAVING` clause
