@@ -72,6 +72,47 @@ Statements for creating databases and work with the objects within a db to repla
   - It is used to prevent actions that would destroy links between tables
 - Check constraint
   - It is used to limit the value range that can be placed in a column.
+
+# DDL Statements: 
+DML Statements create databases and work with the objects within a db 
+
+## `CREATE DATABASE` Statement
+**Syntax**<br>
+`CREATE DATABASE databasename` <br>
+## `CREATE TABLE` Statement 
+**Syntax**<br>
+`CREATE TABLE table_name ( column1 datatype, column2 datatype, column3 datatype, .... );`<br>
+
+**Example:**
+~~~~mysql
+CREATE TABLE IF NOT EXISTS vendors (
+	vendor_id INT AUTO_INCREMENT PRIMARY KEY,
+	vendor_name VARCHAR(60),
+	vendor_address VARCHAR(125),
+	vendor_city VARCHAR(65),
+	vendor_state VARCHAR(35)
+);
+~~~~
+##`ALTER TABLE` Statement
+
+**Syntaxes** 
+`ALTER TABLE table_name ADD column_name datatype;` <br>
+`ALTER TABLE table_name DROP COLUMN column_name;`<br>
+`ALTER TABLE table_name MODIFY COLUMN column_name datatype;` <br>
+
+Use this command when: after creating a table, you may need to:
+- `ADD` additional attributes/columns. 
+- `DROP` i.e. delete/remove a column
+- `MODIFY` a column
+
+##`DROP` DB or TABLE Statement
+**Syntaxes** 
+`DROP DATABASE databasename` <br>
+`DROP TABLE table_name` <br>
+
+Use this command when: 
+- you want to delete/remove a whole database or table name
+
 # DML Statements: 
 DML statements are used to manipulate data in tables
 - SELECT
