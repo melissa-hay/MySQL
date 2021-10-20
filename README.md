@@ -800,12 +800,14 @@ HAVING C2
 - `[HAVING C2]` is optional; it is used to restrict the rows affected by the `GROUP BY` clause. It is similar to the `WHERE` clause.
 
 
-**Semantics of SQL with `GROUP BY`**
-1.	Evaluate `FROM` `WHERE` using Nested Loop Semantics
-2.	`GROUP BY` by the attributes a1, …, ak
-3.	Apply condition C2 to each group (may have aggregates)
+**Semantics of SQL `SELECT` and `GROUP BY`**
+1.	Evaluate `FROM` Clause first
+2.	Evaluate `WHERE` clause 
+3.	`GROUP BY` by the attributes a1, …, ak
+4.	Apply condition C2 to each group (may have aggregates)
     - `HAVING` is evaluated after `GROUP BY`
-4.	Compute aggregates and return the result
+5.	`SElECT` statement: Compute aggregates 
+6.	`ORDER BY` clause and return the result
 
 
 # `HAVING` clause
@@ -842,13 +844,8 @@ GROUP BY column_name1, column_name2
 HAVING aggregate function(column_name3) > some_value;
 ~~~~
 
-### `WHERE` vs. `HAVING`
-| `WHERE` Condition| `HAVING` Condition |
-| ------------- |:-------------:| 
-| is applied to individual rows | Is applied to an entire group of group |
-| The rows may or may not contribute to the aggregate | Only applicable if GROUP BY is involved |
-| No aggregates allowed in or after the WHERE clause | Entire group is returned, or removed |
-| | May use aggregate functions on the group |
+### `WHERE` vs. `HAVING` <br>
+![image](https://user-images.githubusercontent.com/49015081/138153696-1085b17f-6d06-408f-a0a1-10c4e549c18a.png) <br>
 
 **Example**
 ~~~~mysql
