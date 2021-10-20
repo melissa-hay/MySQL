@@ -212,8 +212,8 @@ WHERE invoice_total - payment_total - credit_total = 0
 ~~~~
 
 # `WHERE` Clause
-The `WHERE` clause specifies the condition a row must meet to be selected. Also called the **search condition**; it filters the rows in the base table by the boolean expression returned by a comparison operator– boolean expressions can be true, false, or NULL in value. For example, `WHERE value > 0`. <br>
-If you omit the `WHERE` clause, all the rows in the base table are returned.
+The `WHERE` clause specifies the condition a row must meet to be selected. Also called the **search condition**; it filters the result set to include rows where the search condition is TRUE. Note that boolean expressions can be true, false, or NULL in value. For example, `WHERE value > 0`. <br>
+If you omit the `WHERE` clause, all the rows in the result set are returned.
 
 ## Comparison operators
 - Comparison operators are used in `WHERE` clause. You cannot use them in the `SELECT` statement
