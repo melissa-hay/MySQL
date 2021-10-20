@@ -763,8 +763,10 @@ Problem: For each manufacturer, compute how many products with price > $100 they
 # `GROUP BY` clause
 _**What**_<br>
 - The `GROUP BY` statement is used with the `SELECT` statement to arrange identical data into groups.
-- The `GROUP BY` statement groups rows that have the same values into summary rows, like "find the number of customers in each country".
+- The `GROUP BY` statement groups rows that have the same values into summary (aggregates) rows, like "find the number of customers in each country".
 - It is often used with aggregate functions (`COUNT()`, `MAX()`, `MIN()`, `SUM()`, `AVG()`) to group the result-set by one or more columns.
+
+![image](https://user-images.githubusercontent.com/49015081/138138919-c93e1f1c-5a40-4efe-96ba-fb4a2649c402.png) <br>
 
 **Syntax of `GROUP BY` with 'WHERE' clause**
 ~~~~mysql
