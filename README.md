@@ -490,10 +490,10 @@ FROM vendors INNER JOIN invoices                (2)
    ON vendors.vendor_id = invoices.vendor_id    (3)
 ORDER BY invoice_number;                        (4)
 ~~~~
-(1) Standard `SELECT` clause
-(2) `FROM` clause that names the two tables that are joined `INNER` keyword is optional
-(3) `ON` phrase that names the columns where the tables are joined and how they are compared columns preceded by table_name. are called 'qualified columns' because you have explain which table they came from
-(4) Standard `ORDER BY` clause
+(1) Standard `SELECT` clause <br>
+(2) `FROM` clause that names the two tables that are joined `INNER` keyword is optional <br>
+(3) `ON` phrase that names the columns where the tables are joined and how they are compared columns preceded by table_name. are called 'qualified columns' because you have explain which table they came from <br>
+(4) Standard `ORDER BY` clause <br>
 
 ### Example:  Joining two tables using the implicit join syntax
 ~~~~mysql
