@@ -876,19 +876,22 @@ ORDER BY invoice_qty;
 **BEST PRACTICE** You can use either the `WHERE` or `HAVING` clause to code non-aggregate clauses, but it makes more sense to include them all in the `HAVING` clause for readability.
 
 # Common table expressions (CTE)
-A CTE is a `SELECT` statement that creates one or more named temporary result sets i.e. **aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries. The `WITH` clause will compute the aggregation once, give it a name, and allow us to reference it (maybe multiple times), later in the query.
+A CTE is a `SELECT` statement that creates one or more named temporary result tables i.e. **table aliases** that can be used by the query that follows. Use CTEs to simplify complex queries that use subqueries. The `WITH` clause will compute the aggregation once, give the resulting table a name, and allow us to reference it (maybe multiple times), later in the query.
 
-CTEs begin with a `WITH` clause that has one or more comma-separated subclauses. Each subclause provides a subquery that produces a result set, and associates a name (alias) with the subquery. 
+CTEs begin with a `WITH` clause that has one or more comma-separated subclauses. Each subclause provides a subquery that produces a result table, and associates a name (table alias) with the subquery. 
 > The `WITH` clause is very confusing at first because the SQL statement does not begin with the word `SELECT`. Instead, we use the `WITH` clause to start our SQL query, defining the aggregations, which can then be named in the main query as if they were real tables.
 
 **Syntax with 1 alias**
 ~~~~mysql
-WITH alias 
-AS (SELECT column_name(s) FROM table_name)
-SELECT column_names(s) FROM alias [,table_name]
-[WHERE <join_condition>]
+WITH table_alias 
+AS (SELECT column_name(s) AS column_alias FROM table_name)
+SELECT column_name(s) 
+FROM table_alias[, table_name]
+[WHERE column_alias = column_name AND ...]
 ~~~~
 - Notice how the outer `SELECT` query uses the alias created in the `WITH` clause. 
+- This is just an example and exact formatting will be query-dependent however, it shows that the WITH keyword creates a `table_alias` which can be used later on in the `FROM` clause and that the `column_alias` produced in the subquery can also be used later on in the `WHERE` clause b/c it is part of the temporary table named `table alias`. 
+ 
 
 Only one `WITH` clause is permitted at the same level so use a single `WITH` clause that separates the subclauses by a comma:
 ~~~~mysql
@@ -1174,10 +1177,10 @@ WHERE invoice_total <
 ## Subqueries in FROM clause 
 
 Sometimes we need to compute an intermediate / temporary table only to use it later in a `SELECT-FROM-WHERE`.
--	Option 1: use a subquery in the FROM clause
--	Option 2: use the WITH clause
+-	Option 1: use a subquery in the FROM clause -> subquery in `FROM` returns a temporary table. You must reference it with a `table_alias`. 
+-	Option 2: use the WITH clause -> recall that this creates a temporary table referenced by `table_alias`
 
-**Example** : Returns the largest invoice total for the top vendor in each state. <br>
+**Example** :  <br>
 ![image](https://user-images.githubusercontent.com/49015081/137148328-3ca19b10-2d72-416c-841a-e65f5cf7bf23.png) <br>
 Note that this can also be solved without a subquery. 
 
@@ -1203,6 +1206,39 @@ ORDER BY vendor_state;
 1. The subquery returns the sum of the invoice_total for every vendor that is in the invoices table
 2. Alias in the subquery is used in the main query.
 3. Alias for the subquery
+
+### Finding witnesses
+Consider the schemas:
+- Company (cid, cname, city)
+- Product (pid, pname, price, cid)
+
+_Problem_ : For each city, find the most expensive product made in that city. <br>
+
+Finding the maximum price is easy:<br>
+![image](https://user-images.githubusercontent.com/49015081/138308129-26c88ead-e848-4287-9840-1282639a4517.png) <br>
+- Output: ![image](https://user-images.githubusercontent.com/49015081/138308165-3714e60f-5a5b-4cde-acb4-4113c8cb3641.png) <br>
+
+But we need the **witnesses**, i.e., the **products with maximum price**! We need to show the product name. <br>
+
+How can we relate product name to maximal price? <br>
+
+**Could we use this Query? ** <br>
+![image](https://user-images.githubusercontent.com/49015081/138308335-e7be31b7-929f-4961-aba4-1fd774e6bb24.png) <br>
+ Output:![image](https://user-images.githubusercontent.com/49015081/138308406-f6a1429f-fe53-4ff8-9be5-e6e513a06230.png) <br>
+- No! The output is wrong. Max price of pname = air conn is not 5200! <br>
+
+**Solution 1: Subqueries within WITH clause** <br>
+CityMax is the temporary table <br>
+![image](https://user-images.githubusercontent.com/49015081/138308545-92e07402-6077-4503-9823-eeadf5953ec5.png) <br>
+- Output: ![image](https://user-images.githubusercontent.com/49015081/138308588-4e4b57ba-851c-483c-8f6c-4928162b0a67.png) <br>
+- Output is correct!
+
+**Solution 2: Subqueries within FROM clause** <br>
+![image](https://user-images.githubusercontent.com/49015081/138308711-db702860-07b0-40e5-8a55-1067dc1db8f2.png) <br>
+
+**Solution 3: Subquery in WHERE clause** <br>
+![image](https://user-images.githubusercontent.com/49015081/138308751-ccb3dd14-8406-413a-b387-8c8606201ae9.png) <br>
+
 
 ## Subqueries in the HAVING clause
 Specify a search condition just like the WHERE clause.
