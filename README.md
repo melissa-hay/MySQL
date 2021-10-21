@@ -802,12 +802,13 @@ HAVING C2
 
 **Semantics of SQL `SELECT` and `GROUP BY`**
 1.	Evaluate `FROM` Clause first
-2.	Evaluate `WHERE` clause 
-3.	`GROUP BY` by the attributes a1, …, ak
-4.	Apply condition C2 to each group (may have aggregates)
+2.	Evaluate the JOIN 
+3.	Evaluate `WHERE` clause 
+4.	`GROUP BY` by the attributes a1, …, ak
+5.	`HAVING` clause: Apply condition C2 to each group (may have aggregates)
     - `HAVING` is evaluated after `GROUP BY`
-5.	`SElECT` statement: Compute aggregates 
-6.	`ORDER BY` clause and return the result
+6.	`SElECT` statement: Compute aggregates 
+7.	`ORDER BY` clause and return the result
 
 
 # `HAVING` clause
@@ -829,19 +830,12 @@ GROUP BY column_name1[, column_name2,…]
 - `[HAVING condition]` is optional; it is used to restrict the rows affected by the `GROUP BY` clause. It is similar to the `WHERE` clause.
 - In this syntax, the `GROUP BY` clause summarizes the rows into groups and the `HAVING` clause applies one or more conditions to these groups. Only groups that make the conditions evaluate to TRUE are included in the result. In other words, the groups for which the condition evaluates to FALSE or UNKNOWN are filtered out.
 
-Because SQL Server processes the `HAVING` clause after the `GROUP BY` clause, you cannot refer to the aggregate function specified in the `SELECT` list by using its column alias. The following query will fail:
+In MYSQL, the `HAVING` clause can refer to the aggregate function specified in the `SELECT` list by using its column alias. The following query will not fail:
 ~~~~mysql
 SELECT column_name1, column_name2, aggregate function(column_name3) as column_alias
 FROM table
 GROUP BY column_name1, column_name2 
 HAVING column_alias > some_value;
-~~~~
-Instead, you must use the aggregate function expression in the `HAVING` clause explicitly as follows:
-~~~~mysql
-SELECT column_name1, column_name2, aggregate function(column_name3) as column_alias
-FROM table
-GROUP BY column_name1, column_name2 
-HAVING aggregate function(column_name3) > some_value;
 ~~~~
 
 ### `WHERE` vs. `HAVING` <br>
