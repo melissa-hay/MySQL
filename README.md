@@ -408,7 +408,7 @@ The identifier quote character is the backtick (`):
 # Joins 
 A JOIN clause in SQL is used to combine rows from two or more tables, based on a related attributes between them.
 
-By default, joins in SQL are “inner joins” which is the most common one.
+By default, joins in SQL are “joins” which is the most common one.
 
 Consider the 2 schemas:
 - Product(name , category)
@@ -443,8 +443,9 @@ Generally speaking, Joins are based on primary key == foreign key.
 ## Inner Join 
 `INNER JOIN`  selects all rows from both tables as long as there is a match between the columns. If there are records in the `Orders` table that do not have matches in `Customers`, these orders will not be shown
 
-###Syntax (2 syntaxes. Both work)
-**Syntax 1 : Explicit JOIN syntax**
+### Syntax (2 syntaxes. Both work)
+
+**Syntax 1 : Explicit JOIN syntax** 
 ~~~~mysql
 SELECT column_name(s)
 FROM table1 
