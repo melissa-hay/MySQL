@@ -419,7 +419,7 @@ Consider the 2 schemas:
 Generally speaking, Joins are based on primary key == foreign key. 
 
 ## Types of Joins
-***Inner joins:*** returns all records that have matching rows in both tables --> this is the intersection of the tables. <br>
+***Inner joins:*** returns all records that have matching rows in both tables --> this is the intersection of the tables. Matching columns from both tables will be in the output <br>
 ![image](https://user-images.githubusercontent.com/49015081/137383300-8435011f-a946-41ba-b49c-9768b0d31f75.png) <br>
 ***Outer joins–*** 3 types:
 1) ***LEFT JOIN:*** returns only matched rows from right table and ALL (even unmatched) rows from the left table i.e. returns ‘inner join + additional info in RS table) 
@@ -439,6 +439,8 @@ Generally speaking, Joins are based on primary key == foreign key.
 > ### Full outer vs. cross join:
 > - a cross join with an empty table (or result set) results in empty table (M x N; hence M x 0 = 0)
 > - A full outer join will always have rows unless both M and N are 0.
+
+***Natural Join:*** creates an implicit join clause based on the common columns in the two tables being joined (do not have to specify matching columns). This is similar to inner join except that the output table contains no repeated data– columns with the same name are displayed only once.  
 
 ## Inner Join 
 `INNER JOIN`  selects all rows from both tables as long as there is a match between the columns. If there are records in the `Orders` table that do not have matches in `Customers`, these orders will not be shown
@@ -472,7 +474,8 @@ WHERE T1.column_name = T2.column_name…;
 **How Inner Join works**
 - compares each row of table 1 with each row of table 2 to see which rows satisfy the conditions. 
 - If a row from each of the tables satisfies a condition, it will be in the output. 
-- In other words, the satisfying rows from both tables will be joined together and put in the output. 
+- In other words, the satisfying rows from **both tables** will be joined together and put in the output. 
+  - This means that the output will contain repeated data since matched rows from both tables will be in the joined table.  
 - Then, only SELECTed columns of those rows will be displayed.
 
 ### Example
@@ -507,6 +510,33 @@ SQL Inner Join permits us to use `Group by` clause along with aggregate function
 ![image](https://user-images.githubusercontent.com/49015081/137385260-8a55fbb2-65e6-4eeb-9b15-5b52150fd012.png) <br>
 Here, we intend to obtain total items sold by each Pizza company present in the City. As you can see below, aggregated result in `totalquantitysold` column as `18` (7+11) and `9` (6+3) for `Los Angeles` and `San Diego` respectively is computed <br>
 ![image](https://user-images.githubusercontent.com/49015081/137385326-6ef66515-a294-4092-a5fc-1fbe97338ea1.png) <br>
+
+## Natural Join 
+**Syntax : **<br> 
+~~~~mysql
+SELECT *
+FROM table1 
+NATURAL JOIN table2;
+~~~~
+- tables have one or more pairs of identically columns
+- Same columns must be the same data type.
+
+### Example:  inner join vs. natural join <br>
+Consider the tables below: <br>
+![image](https://user-images.githubusercontent.com/49015081/141483515-a2fd3dc6-6a71-4ad3-be5d-297b825aa7f1.png) <br>
+
+The `INNER JOIN` of `TableA` and `TableB` on `Column1` will return: <br>
+`SELECT * FROM TableA AS a INNER JOIN TableB AS b ON a.Column1 = b.Column1;`<br>
+![image](https://user-images.githubusercontent.com/49015081/141483621-29ef0430-4388-4814-b4a6-7ded0a36cf78.png) <br>
+
+The `NATURAL JOIN` of `TableA` and `TableB` on `Column1` will return: <br>
+`SELECT * FROM TableA NATURAL JOIN TableB;` <br>
+![image](https://user-images.githubusercontent.com/49015081/141483741-f5ddc025-1395-4e7c-a459-a2379063423c.png) <br>
+
+The repeated column is avoided.
+
+
+
 
 
 ## Left Join 
