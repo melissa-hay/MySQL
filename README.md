@@ -526,18 +526,25 @@ Consider the tables below: <br>
 ![image](https://user-images.githubusercontent.com/49015081/141483515-a2fd3dc6-6a71-4ad3-be5d-297b825aa7f1.png) <br>
 
 The `INNER JOIN` of `TableA` and `TableB` on `Column1` will return: <br>
-`SELECT * FROM TableA AS a INNER JOIN TableB AS b ON a.Column1 = b.Column1;`<br>
+~~~~mysql
+SELECT * FROM TableA 
+AS a 
+INNER JOIN TableB 
+AS b 
+ON a.Column1 = b.Column1;
+~~~~ 
+
 ![image](https://user-images.githubusercontent.com/49015081/141483621-29ef0430-4388-4814-b4a6-7ded0a36cf78.png) <br>
 
 The `NATURAL JOIN` of `TableA` and `TableB` on `Column1` will return: <br>
-`SELECT * FROM TableA NATURAL JOIN TableB;` <br>
+~~~~mysql
+SELECT * 
+FROM TableA
+NATURAL JOIN TableB;
+~~~~ 
 ![image](https://user-images.githubusercontent.com/49015081/141483741-f5ddc025-1395-4e7c-a459-a2379063423c.png) <br>
 
 The repeated column is avoided.
-
-
-
-
 
 ## Left Join 
 
